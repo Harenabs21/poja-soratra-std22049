@@ -23,34 +23,16 @@ public class SoratraController {
     public ResponseEntity<String> createFiles(@PathVariable String id, @RequestBody String text) {
         try {
             // Créer un nouvel objet File pour le fichier original
-            File originalFile = new File(id + "-original.txt");
-
-            // Créer un FileWriter et un BufferedWriter pour le fichier original
+            File originalFile =  File.createTempFile(id + "-original", ".txt");
             FileWriter originalFileWriter = new FileWriter(originalFile);
-            BufferedWriter originalBufferedWriter = new BufferedWriter(originalFileWriter);
-
-            // Écrire le texte poétique dans le fichier original
-            originalBufferedWriter.write(text.toLowerCase());
-
-            // Fermer le BufferedWriter du fichier original
-            originalBufferedWriter.close();
-
-            // Lire le fichier original
-            String originalText = text.toLowerCase();
-
-            // Créer un nouvel objet File pour le fichier modifié
-            File modifiedFile = new File(id + "-modified.txt");
-
-            // Créer un FileWriter et un BufferedWriter pour le fichier modifié
-            FileWriter modifiedFileWriter = new FileWriter(modifiedFile);
-            BufferedWriter modifiedBufferedWriter = new BufferedWriter(modifiedFileWriter);
-
-            // Écrire le texte en majuscules dans le fichier modifié
-            modifiedBufferedWriter.write(originalText.toUpperCase());
-
-            // Fermer le BufferedWriter du fichier modifié
-            modifiedBufferedWriter.close();
+            originalFileWriter.append(text.toLowerCase());
+            originalFileWriter.close();
             bucket.upload(originalFile,id);
+
+            File modifiedFile =  File.createTempFile(id + "-modified",".txt");
+            FileWriter modifiedFileWriter = new FileWriter(modifiedFile);
+            modifiedFileWriter.append(text.toUpperCase());
+            modifiedFileWriter.close();
             bucket.upload(modifiedFile,id);
 
             return new ResponseEntity<>("Fichiers créés avec succès", HttpStatus.OK);
