@@ -1,14 +1,13 @@
 package hei.school.soratra.endpoint;
 
 import hei.school.soratra.file.BucketComponent;
+import hei.school.soratra.repository.model.GetURL;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
+import java.time.Duration;
 
 @RestController
 public class SoratraController {
@@ -40,6 +39,14 @@ public class SoratraController {
             e.printStackTrace();
             return new ResponseEntity<>("Erreur lors de la création des fichiers", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/soratra/{id}")
+    public GetURL getOriginalAndModifiedText(@PathVariable String id) {
+        GetURL urls = new GetURL();
+        urls.setOriginalURL(bucket.presign(id+"-original.txt", Duration.ofMinutes(10)).toString());
+        urls.setModifiedURL(bucket.presign(id+"-modified.txt", Duration.ofMinutes(10)).toString());
+        return urls;
     }
 }
 
